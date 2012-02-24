@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.dodowaterfall.LazyScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+  android:id="@+id/waterfall_scroll"
+     >
+
+    <LinearLayout
+        android:id="@+id/waterfall_container"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="@android:color/white" >
+    </LinearLayout>
+
+</com.dodowaterfall.LazyScrollView>
