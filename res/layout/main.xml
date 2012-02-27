@@ -3,13 +3,15 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
   android:id="@+id/waterfall_scroll"
+  android:scrollbars="vertical"
      >
 
     <LinearLayout
         android:id="@+id/waterfall_container"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:background="@android:color/white" >
+        android:background="@android:color/white" 
+        >
     </LinearLayout>
 
 </com.dodowaterfall.LazyScrollView>
