@@ -1,14 +1,22 @@
 package com.dodowaterfall.widget;
 
+import java.io.BufferedInputStream;
+import java.io.IOException;
+
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.AnimationDrawable;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.Toast;
 import android.os.Handler;
+import android.os.Message;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup.LayoutParams;
 
 public class FlowView extends ImageView implements View.OnClickListener,
 		View.OnLongClickListener {
@@ -68,8 +76,9 @@ public class FlowView extends ImageView implements View.OnClickListener,
 	 */
 	public void LoadImage() {
 		if (getFlowTag() != null) {
-			task = new ImageLoaderTask(this);
-			task.execute(getFlowTag());
+			// task = new ImageLoaderTask(this);
+			// task.execute(getFlowTag());
+			new LoadImageThread().start();
 		}
 	}
 
@@ -78,9 +87,9 @@ public class FlowView extends ImageView implements View.OnClickListener,
 	 */
 	public void Reload() {
 		if (this.bitmap == null && getFlowTag() != null) {
-			task = new ImageLoaderTask(this);
-			task.execute(getFlowTag());
-			
+			// task = new ImageLoaderTask(this);
+			// task.execute(getFlowTag());
+			new LoadImageThread().start();
 		}
 	}
 
@@ -128,4 +137,55 @@ public class FlowView extends ImageView implements View.OnClickListener,
 		return this;
 	}
 
+	class LoadImageThread extends Thread {
+		LoadImageThread() {
+		}
+
+		public void run() {
+
+			if (flowTag != null) {
+
+				BufferedInputStream buf;
+				try {
+					buf = new BufferedInputStream(flowTag.getAssetManager()
+							.open(flowTag.getFileName()));
+					bitmap = BitmapFactory.decodeStream(buf);
+
+				} catch (IOException e) {
+
+					e.printStackTrace();
+				}
+				// if (bitmap != null) {
+
+				// 此处不能直接更新UI，否则会发生异常：
+				// CalledFromWrongThreadException: Only the original thread that
+				// created a view hierarchy can touch its views.
+				// 也可以使用Handler或者Looper发送Message解决这个问题
+
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						if (bitmap != null) {// 此处在线程过多时可能为null
+							int width = bitmap.getWidth();// 获取真实宽高
+							int height = bitmap.getHeight();
+
+							LayoutParams lp = getLayoutParams();
+							lp.height = (height * flowTag.getItemWidth())
+									/ width;// 调整高度
+							setLayoutParams(lp);
+
+							setImageBitmap(bitmap);// 将引用指定到同一个对象，方便销毁
+							Handler h = getViewHandler();
+							Message m = h.obtainMessage(flowTag.what, width,
+									height, FlowView.this);
+							h.sendMessage(m);
+						}
+					}
+				});
+
+				// }
+
+			}
+
+		}
+	}
 }

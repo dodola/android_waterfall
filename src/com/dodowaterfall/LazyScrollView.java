@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ScrollView;
@@ -13,31 +12,12 @@ public class LazyScrollView extends ScrollView {
 	@Override
 	protected void onScrollChanged(int l, int t, int oldl, int oldt) {
 		super.onScrollChanged(l, t, oldl, oldt);
-		if (view != null) {
-			Log.d("LazyScrollView", String.format(
-					"onScrollChanged:%d %d %d %d", l, t, oldl, oldt));
-			if (view.getMeasuredHeight() <= getScrollY() + getHeight()) {
-				if (onScrollListener != null) {
-					onScrollListener.onBottom();
-				}
-
-			} else if (getScrollY() == 0) {
-				if (onScrollListener != null) {
-					onScrollListener.onTop();
-				}
-			} else {
-				if (onScrollListener != null) {
-					onScrollListener.onScroll();
-				}
-			}
-		}
-
+		onScrollListener.onAutoScroll();
 	}
 
 	private static final String tag = "LazyScrollView";
 	private Handler handler;
 	private View view;
-	private boolean isOnTouch = false;
 
 	public LazyScrollView(Context context) {
 		super(context);
@@ -63,12 +43,70 @@ public class LazyScrollView extends ScrollView {
 		return super.computeVerticalScrollOffset();
 	}
 
+	private void init() {
+
+		this.setOnTouchListener(onTouchListener);
+		handler = new Handler() {
+			@Override
+			public void handleMessage(Message msg) {
+				// process incoming messages here
+				super.handleMessage(msg);
+				switch (msg.what) {
+				case 1:
+					if (view.getMeasuredHeight()- 20 <= getScrollY() + getHeight()
+							) {
+						if (onScrollListener != null) {
+							onScrollListener.onBottom();
+						}
+
+					} else if (getScrollY() == 0) {
+						if (onScrollListener != null) {
+							onScrollListener.onTop();
+						}
+					} else {
+						if (onScrollListener != null) {
+							onScrollListener.onScroll();
+						}
+					}
+					break;
+				default:
+					break;
+				}
+			}
+		};
+
+	}
+
+	OnTouchListener onTouchListener = new OnTouchListener() {
+
+		@Override
+		public boolean onTouch(View v, MotionEvent event) {
+
+			switch (event.getAction()) {
+			case MotionEvent.ACTION_DOWN:
+				break;
+			case MotionEvent.ACTION_UP:
+				if (view != null && onScrollListener != null) {
+					handler.sendMessageDelayed(handler.obtainMessage(1), 200);
+				}
+				break;
+
+			default:
+				break;
+			}
+			return false;
+		}
+
+	};
+
 	/**
 	 * 获得参考的View，主要是为了获得它的MeasuredHeight，然后和滚动条的ScrollY+getHeight作比较。
 	 */
 	public void getView() {
 		this.view = getChildAt(0);
-
+		if (view != null) {
+			init();
+		}
 	}
 
 	/**
@@ -83,6 +121,8 @@ public class LazyScrollView extends ScrollView {
 		void onTop();
 
 		void onScroll();
+
+		void onAutoScroll();
 	}
 
 	private OnScrollListener onScrollListener;

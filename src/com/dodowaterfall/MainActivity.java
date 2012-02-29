@@ -22,6 +22,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.Toast;
 
 public class MainActivity extends Activity {
@@ -39,16 +40,19 @@ public class MainActivity extends Activity {
 	private int column_count = 4;// 显示列数
 	private int page_count = 15;// 每次加载15张图片
 
-	private int current_page = 0;
+	private int current_page = 0;// 当前页数
 
-	private int[] topIndex;
-	private int[] bottomIndex;
+	private int[] topIndex;// 待用
+	private int[] bottomIndex;// 待用
 
-	private int[] column_height;
+	private int[] column_height;// 每列的高度
 
 	private HashMap<Integer, String> pins;
-	private int loaded_count = 0;
+
+	private int loaded_count = 0;// 已加载数量
+
 	private HashMap<Integer, Integer>[] pin_mark = null;
+
 	private Context context;
 
 	private HashMap<Integer, FlowView> iviews;
@@ -68,6 +72,8 @@ public class MainActivity extends Activity {
 		context = this.getApplicationContext();
 		iviews = new HashMap<Integer, FlowView>();
 		pins = new HashMap<Integer, String>();
+
+		pin_mark = new HashMap[column_count];
 		InitLayout();
 
 	}
@@ -87,8 +93,18 @@ public class MainActivity extends Activity {
 			@Override
 			public void onScroll() {
 
+			}
+
+			@Override
+			public void onBottom() {
+				// 滚动到最低端
+				AddItemToContainer(++current_page, page_count);
+			}
+
+			@Override
+			public void onAutoScroll() {
 				// 暂时解决,需重写
-				// 滚动
+				// 自动滚动
 				Rect bounds = new Rect();
 
 				Rect scrollBounds = new Rect(waterfall_scroll.getScrollX(),
@@ -110,12 +126,6 @@ public class MainActivity extends Activity {
 					}
 				}
 
-			}
-
-			@Override
-			public void onBottom() {
-				// 滚动到最低端
-				AddItemToContainer(++current_page, page_count);
 			}
 		});
 
@@ -140,6 +150,8 @@ public class MainActivity extends Activity {
 					// Toast.LENGTH_SHORT).show();
 
 					FlowView v = (FlowView) msg.obj;
+					int w = msg.arg1;
+					int h = msg.arg2;
 					Log.d("MainActivity",
 							String.format(
 									"获取实际View高度:%d,ID：%d,columnIndex:%d,rowIndex:%d,filename:%s",
@@ -147,7 +159,12 @@ public class MainActivity extends Activity {
 											.getColumnIndex(), v.getRowIndex(),
 									v.getFlowTag().getFileName()));
 					String f = v.getFlowTag().getFileName();
-					column_height[v.getColumnIndex()] += v.getHeight();
+
+					// 此处计算列值
+					int columnIndex = GetMinValue(column_height);
+					v.setColumnIndex(columnIndex);
+
+					column_height[columnIndex] += h;
 
 					pins.put(v.getId(), f);
 					iviews.put(v.getId(), v);
@@ -191,25 +208,30 @@ public class MainActivity extends Activity {
 
 	private void AddItemToContainer(int pageindex, int pagecount) {
 		int currentIndex = pageindex * pagecount;
+		// 将废弃：按照顺序排列图片，发现问题，如果图片不均匀则会出现有的列过长有的列短的情况
+		// 将采用根据高度最小的那列添加图片的方式
 		int j = currentIndex % column_count;
+
 		int imagecount = image_filenames.size();
 		for (int i = currentIndex; i < pagecount * (pageindex + 1)
 				&& i < imagecount; i++) {
 			loaded_count++;
 			j = j >= column_count ? j = 0 : j;
+
+			// j = GetMinValue(column_height);
 			AddImage(image_filenames.get(i), j++,
 					(int) Math.ceil(loaded_count / (double) column_count),
 					loaded_count);
-
 		}
 
 	}
 
 	private void AddImage(String filename, int columnIndex, int rowIndex, int id) {
+
 		FlowView item = (FlowView) LayoutInflater.from(this).inflate(
 				R.layout.waterfallitem, null);
-
 		item.setColumnIndex(columnIndex);
+
 		item.setRowIndex(rowIndex);
 		item.setId(id);
 		item.setViewHandler(this.handler);
@@ -224,5 +246,17 @@ public class MainActivity extends Activity {
 		item.LoadImage();
 		waterfall_items.get(columnIndex).addView(item);
 
+	}
+
+	private int GetMinValue(int[] array) {
+		int m = 0;
+		int length = array.length;
+		for (int i = 0; i < length; ++i) {
+
+			if (array[i] < array[m]) {
+				m = i;
+			}
+		}
+		return m;
 	}
 }

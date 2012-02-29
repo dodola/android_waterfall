@@ -20,6 +20,7 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+//已不使用此类：AsyncTask加载过多会造成 java.util.concurrent.RejectedExecutionException
 public class ImageLoaderTask extends AsyncTask<FlowTag, Void, Bitmap> {
 
 	private FlowTag param;
