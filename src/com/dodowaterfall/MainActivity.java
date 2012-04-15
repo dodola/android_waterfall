@@ -3,8 +3,10 @@ package com.dodowaterfall;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 
 import com.dodowaterfall.LazyScrollView.OnScrollListener;
 import com.dodowaterfall.widget.FlowTag;
@@ -38,13 +40,13 @@ public class MainActivity extends Activity {
 	private int item_width;
 
 	private int column_count = 4;// 显示列数
-	private int page_count = 15;// 每次加载15张图片
+	private int page_count = 30;// 每次加载30张图片
 
 	private int current_page = 0;// 当前页数
 
-	private int[] topIndex;// 待用
-	private int[] bottomIndex;// 待用
-
+	private int[] topIndex;
+	private int[] bottomIndex;
+	private int[] lineIndex;
 	private int[] column_height;// 每列的高度
 
 	private HashMap<Integer, String> pins;
@@ -56,6 +58,7 @@ public class MainActivity extends Activity {
 	private Context context;
 
 	private HashMap<Integer, FlowView> iviews;
+	int scroll_height;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -66,14 +69,22 @@ public class MainActivity extends Activity {
 		item_width = display.getWidth() / column_count;// 根据屏幕大小计算每列大小
 		asset_manager = this.getAssets();
 
-		topIndex = new int[column_count];
-		bottomIndex = new int[column_count];
 		column_height = new int[column_count];
-		context = this.getApplicationContext();
+		context = this;
 		iviews = new HashMap<Integer, FlowView>();
 		pins = new HashMap<Integer, String>();
-
 		pin_mark = new HashMap[column_count];
+
+		this.lineIndex = new int[column_count];
+		this.bottomIndex = new int[column_count];
+		this.topIndex = new int[column_count];
+
+		for (int i = 0; i < column_count; i++) {
+			lineIndex[i] = -1;
+			bottomIndex[i] = -1;
+			pin_mark[i] = new HashMap();
+		}
+
 		InitLayout();
 
 	}
@@ -102,28 +113,73 @@ public class MainActivity extends Activity {
 			}
 
 			@Override
-			public void onAutoScroll() {
-				// 暂时解决,需重写
-				// 自动滚动
-				Rect bounds = new Rect();
+			public void onAutoScroll(int l, int t, int oldl, int oldt) {
 
-				Rect scrollBounds = new Rect(waterfall_scroll.getScrollX(),
-						waterfall_scroll.getScrollY(), waterfall_scroll
-								.getScrollX() + waterfall_scroll.getWidth(),
-						waterfall_scroll.getScrollY()
-								+ waterfall_scroll.getHeight());
-				for (int i = 1; i < loaded_count; i++) {
-					FlowView v = iviews.get(i);
-					if (v != null) {
-						v.getHitRect(bounds);
-						if (Rect.intersects(scrollBounds, bounds)) {
-							if (v.bitmap == null) {
-								v.Reload();
+				// Log.d("MainActivity",
+				// String.format("%d  %d  %d  %d", l, t, oldl, oldt));
+
+				// Log.d("MainActivity", "range:" + range);
+				// Log.d("MainActivity", "range-t:" + (range - t));
+				scroll_height = waterfall_scroll.getMeasuredHeight();
+				Log.d("MainActivity", "scroll_height:" + scroll_height);
+
+				if (t > oldt) {// 向下滚动
+					if (t > 2 * scroll_height) {// 超过两屏幕后
+
+						for (int k = 0; k < column_count; k++) {
+
+							LinearLayout localLinearLayout = waterfall_items
+									.get(k);
+
+							if (pin_mark[k].get(Math.min(bottomIndex[k] + 1,
+									lineIndex[k])) <= t + 3 * scroll_height) {// 最底部的图片位置小于当前t+3*屏幕高度
+
+								((FlowView) waterfall_items.get(k).getChildAt(
+										Math.min(1 + bottomIndex[k],
+												lineIndex[k]))).Reload();
+
+								bottomIndex[k] = Math.min(1 + bottomIndex[k],
+										lineIndex[k]);
+
 							}
-						} else {
-							v.recycle();
+							Log.d("MainActivity",
+									"headIndex:" + topIndex[k] + "  footIndex:"
+											+ bottomIndex[k] + "  headHeight:"
+											+ pin_mark[k].get(topIndex[k]));
+							if (pin_mark[k].get(topIndex[k]) < t - 2
+									* scroll_height) {// 未回收图片的最高位置<t-两倍屏幕高度
+
+								int i1 = topIndex[k];
+								topIndex[k]++;
+								((FlowView) localLinearLayout.getChildAt(i1))
+										.recycle();
+								Log.d("MainActivity", "recycle,k:" + k
+										+ " headindex:" + topIndex[k]);
+
+							}
+						}
+
+					}
+				} else {// 向上滚动
+
+					for (int k = 0; k < column_count; k++) {
+						LinearLayout localLinearLayout = waterfall_items.get(k);
+						if (pin_mark[k].get(bottomIndex[k]) > t + 3
+								* scroll_height) {
+							((FlowView) localLinearLayout
+									.getChildAt(bottomIndex[k])).recycle();
+
+							bottomIndex[k]--;
+						}
+
+						if (pin_mark[k].get(Math.max(topIndex[k] - 1, 0)) >= t
+								- 2 * scroll_height) {
+							((FlowView) localLinearLayout.getChildAt(Math.max(
+									-1 + topIndex[k], 0))).Reload();
+							topIndex[k] = Math.max(topIndex[k] - 1, 0);
 						}
 					}
+
 				}
 
 			}
@@ -146,28 +202,34 @@ public class MainActivity extends Activity {
 
 				switch (msg.what) {
 				case 1:
-					// Toast.makeText(context, ((FlowView) msg.obj).getHeight(),
-					// Toast.LENGTH_SHORT).show();
 
 					FlowView v = (FlowView) msg.obj;
 					int w = msg.arg1;
 					int h = msg.arg2;
-					Log.d("MainActivity",
-							String.format(
-									"获取实际View高度:%d,ID：%d,columnIndex:%d,rowIndex:%d,filename:%s",
-									v.getHeight(), v.getId(), v
-											.getColumnIndex(), v.getRowIndex(),
-									v.getFlowTag().getFileName()));
+					// Log.d("MainActivity",
+					// String.format(
+					// "获取实际View高度:%d,ID：%d,columnIndex:%d,rowIndex:%d,filename:%s",
+					// v.getHeight(), v.getId(), v
+					// .getColumnIndex(), v.getRowIndex(),
+					// v.getFlowTag().getFileName()));
 					String f = v.getFlowTag().getFileName();
 
 					// 此处计算列值
 					int columnIndex = GetMinValue(column_height);
+
 					v.setColumnIndex(columnIndex);
 
 					column_height[columnIndex] += h;
 
 					pins.put(v.getId(), f);
 					iviews.put(v.getId(), v);
+					waterfall_items.get(columnIndex).addView(v);
+
+					lineIndex[columnIndex]++;
+
+					pin_mark[columnIndex].put(lineIndex[columnIndex],
+							column_height[columnIndex]);
+					bottomIndex[columnIndex] = lineIndex[columnIndex];
 					break;
 				}
 
@@ -208,29 +270,24 @@ public class MainActivity extends Activity {
 
 	private void AddItemToContainer(int pageindex, int pagecount) {
 		int currentIndex = pageindex * pagecount;
-		// 将废弃：按照顺序排列图片，发现问题，如果图片不均匀则会出现有的列过长有的列短的情况
-		// 将采用根据高度最小的那列添加图片的方式
-		int j = currentIndex % column_count;
 
-		int imagecount = image_filenames.size();
+		int imagecount = 10000;// image_filenames.size();
 		for (int i = currentIndex; i < pagecount * (pageindex + 1)
 				&& i < imagecount; i++) {
 			loaded_count++;
-			j = j >= column_count ? j = 0 : j;
-
-			// j = GetMinValue(column_height);
-			AddImage(image_filenames.get(i), j++,
+			Random rand = new Random();
+			int r = rand.nextInt(image_filenames.size());
+			AddImage(image_filenames.get(r),
 					(int) Math.ceil(loaded_count / (double) column_count),
 					loaded_count);
 		}
 
 	}
 
-	private void AddImage(String filename, int columnIndex, int rowIndex, int id) {
+	private void AddImage(String filename, int rowIndex, int id) {
 
-		FlowView item = (FlowView) LayoutInflater.from(this).inflate(
-				R.layout.waterfallitem, null);
-		item.setColumnIndex(columnIndex);
+		FlowView item = new FlowView(context);
+		// item.setColumnIndex(columnIndex);
 
 		item.setRowIndex(rowIndex);
 		item.setId(id);
@@ -244,7 +301,7 @@ public class MainActivity extends Activity {
 
 		item.setFlowTag(param);
 		item.LoadImage();
-		waterfall_items.get(columnIndex).addView(item);
+		// waterfall_items.get(columnIndex).addView(item);
 
 	}
 

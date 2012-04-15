@@ -12,7 +12,7 @@ public class LazyScrollView extends ScrollView {
 	@Override
 	protected void onScrollChanged(int l, int t, int oldl, int oldt) {
 		super.onScrollChanged(l, t, oldl, oldt);
-		onScrollListener.onAutoScroll();
+		onScrollListener.onAutoScroll(l, t, oldl, oldt);
 	}
 
 	private static final String tag = "LazyScrollView";
@@ -49,12 +49,12 @@ public class LazyScrollView extends ScrollView {
 		handler = new Handler() {
 			@Override
 			public void handleMessage(Message msg) {
-				// process incoming messages here
+			
 				super.handleMessage(msg);
 				switch (msg.what) {
 				case 1:
-					if (view.getMeasuredHeight()- 20 <= getScrollY() + getHeight()
-							) {
+					if (view.getMeasuredHeight() - 20 <= getScrollY()
+							+ getHeight()) {
 						if (onScrollListener != null) {
 							onScrollListener.onBottom();
 						}
@@ -122,7 +122,7 @@ public class LazyScrollView extends ScrollView {
 
 		void onScroll();
 
-		void onAutoScroll();
+		void onAutoScroll(int l, int t, int oldl, int oldt);
 	}
 
 	private OnScrollListener onScrollListener;

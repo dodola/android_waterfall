@@ -76,8 +76,7 @@ public class FlowView extends ImageView implements View.OnClickListener,
 	 */
 	public void LoadImage() {
 		if (getFlowTag() != null) {
-			// task = new ImageLoaderTask(this);
-			// task.execute(getFlowTag());
+
 			new LoadImageThread().start();
 		}
 	}
@@ -87,9 +86,8 @@ public class FlowView extends ImageView implements View.OnClickListener,
 	 */
 	public void Reload() {
 		if (this.bitmap == null && getFlowTag() != null) {
-			// task = new ImageLoaderTask(this);
-			// task.execute(getFlowTag());
-			new LoadImageThread().start();
+
+			new ReloadImageThread().start();
 		}
 	}
 
@@ -137,6 +135,35 @@ public class FlowView extends ImageView implements View.OnClickListener,
 		return this;
 	}
 
+	class ReloadImageThread extends Thread {
+
+		@Override
+		public void run() {
+			if (flowTag != null) {
+
+				BufferedInputStream buf;
+				try {
+					buf = new BufferedInputStream(flowTag.getAssetManager()
+							.open(flowTag.getFileName()));
+					bitmap = BitmapFactory.decodeStream(buf);
+
+				} catch (IOException e) {
+
+					e.printStackTrace();
+				}
+
+				((Activity) context).runOnUiThread(new Runnable() {
+					public void run() {
+						if (bitmap != null) {// 此处在线程过多时可能为null
+							setImageBitmap(bitmap);
+						}
+					}
+				});
+			}
+
+		}
+	}
+
 	class LoadImageThread extends Thread {
 		LoadImageThread() {
 		}
@@ -169,14 +196,19 @@ public class FlowView extends ImageView implements View.OnClickListener,
 							int height = bitmap.getHeight();
 
 							LayoutParams lp = getLayoutParams();
-							lp.height = (height * flowTag.getItemWidth())
+
+							int layoutHeight = (height * flowTag.getItemWidth())
 									/ width;// 调整高度
+							if (lp == null) {
+								lp = new LayoutParams(flowTag.getItemWidth(),
+										layoutHeight);
+							}
 							setLayoutParams(lp);
 
-							setImageBitmap(bitmap);// 将引用指定到同一个对象，方便销毁
+							setImageBitmap(bitmap);
 							Handler h = getViewHandler();
 							Message m = h.obtainMessage(flowTag.what, width,
-									height, FlowView.this);
+									layoutHeight, FlowView.this);
 							h.sendMessage(m);
 						}
 					}
