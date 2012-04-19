@@ -161,22 +161,24 @@ public class MainActivity extends Activity {
 
 					}
 				} else {// 向上滚动
+					if (t > 2 * scroll_height) {// 超过两屏幕后
+						for (int k = 0; k < column_count; k++) {
+							LinearLayout localLinearLayout = waterfall_items
+									.get(k);
+							if (pin_mark[k].get(bottomIndex[k]) > t + 3
+									* scroll_height) {
+								((FlowView) localLinearLayout
+										.getChildAt(bottomIndex[k])).recycle();
 
-					for (int k = 0; k < column_count; k++) {
-						LinearLayout localLinearLayout = waterfall_items.get(k);
-						if (pin_mark[k].get(bottomIndex[k]) > t + 3
-								* scroll_height) {
-							((FlowView) localLinearLayout
-									.getChildAt(bottomIndex[k])).recycle();
+								bottomIndex[k]--;
+							}
 
-							bottomIndex[k]--;
-						}
-
-						if (pin_mark[k].get(Math.max(topIndex[k] - 1, 0)) >= t
-								- 2 * scroll_height) {
-							((FlowView) localLinearLayout.getChildAt(Math.max(
-									-1 + topIndex[k], 0))).Reload();
-							topIndex[k] = Math.max(topIndex[k] - 1, 0);
+							if (pin_mark[k].get(Math.max(topIndex[k] - 1, 0)) >= t
+									- 2 * scroll_height) {
+								((FlowView) localLinearLayout.getChildAt(Math
+										.max(-1 + topIndex[k], 0))).Reload();
+								topIndex[k] = Math.max(topIndex[k] - 1, 0);
+							}
 						}
 					}
 
