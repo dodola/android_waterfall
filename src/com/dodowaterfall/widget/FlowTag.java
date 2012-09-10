@@ -1,11 +1,18 @@
 package com.dodowaterfall.widget;
 
+import com.dodowaterfall.Constants;
+
 import android.content.res.AssetManager;
 
+//这个类是一个java bean，可以不用这个类
 public class FlowTag {
+	
+	public final int what = Constants.HANDLER_WHAT;
+	
 	private int flowId;
 	private String fileName;
-	public final int what = 1;
+	private int ItemWidth;
+	private AssetManager assetManager;
 
 	public int getFlowId() {
 		return flowId;
@@ -22,9 +29,6 @@ public class FlowTag {
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
 	}
-
-	private AssetManager assetManager;
-	private int ItemWidth;
 
 	public AssetManager getAssetManager() {
 		return assetManager;

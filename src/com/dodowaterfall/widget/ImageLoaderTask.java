@@ -4,21 +4,15 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
-import java.util.HashMap;
 
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
-import android.widget.ImageView;
-import android.widget.Toast;
 
 //已不使用此类：AsyncTask加载过多会造成 java.util.concurrent.RejectedExecutionException
 public class ImageLoaderTask extends AsyncTask<FlowTag, Void, Bitmap> {
