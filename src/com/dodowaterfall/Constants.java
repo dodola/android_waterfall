@@ -2,11 +2,11 @@ package com.dodowaterfall;
 
 public class Constants {
 
-	public final static int COLUMN_COUNT = 4; // отй╬апйЩ
+	public final static int COLUMN_COUNT = 4; // Ф≤╬Г╓╨Е┬≈Ф∙╟
 	
-	public final static int PICTURE_COUNT_PER_LOAD = 30; // ц©╢н╪сть30уем╪ф╛
+	public final static int PICTURE_COUNT_PER_LOAD = 30; // Ф╞▐Ф╛║Е┼═Х╫╫30Е╪═Е⌡╬Г┴┤
 	
-	public final static int PICTURE_TOTAL_COUNT = 10000;   //©ирт╪сть╣двН╤Юнд╪ЧйЩ
+	public final static int PICTURE_TOTAL_COUNT = 10000;   //Е┘│Х╝╦Е┼═Х╫╫Г └Ф°─Е╓ Е⌡╬Г┴┤Ф∙╟
 	
 	public final static int HANDLER_WHAT = 1;
 		
