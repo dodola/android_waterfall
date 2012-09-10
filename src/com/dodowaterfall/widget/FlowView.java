@@ -9,7 +9,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.AnimationDrawable;
 import android.widget.ImageView;
-import android.widget.ScrollView;
 import android.widget.Toast;
 import android.os.Handler;
 import android.os.Message;
@@ -51,7 +50,7 @@ public class FlowView extends ImageView implements View.OnClickListener,
 	private void Init() {
 
 		setOnClickListener(this);
-		this.setOnLongClickListener(this);
+		setOnLongClickListener(this);
 		setAdjustViewBounds(true);
 
 	}
