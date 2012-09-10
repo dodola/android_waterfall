@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Random;
 
 import com.dodowaterfall.LazyScrollView.OnScrollListener;
-import com.dodowaterfall.widget.FlowTag;
 import com.dodowaterfall.widget.FlowView;
 import android.app.Activity;
 import android.content.Context;
@@ -208,7 +207,7 @@ public class MainActivity extends Activity {
 					// v.getHeight(), v.getId(), v
 					// .getColumnIndex(), v.getRowIndex(),
 					// v.getFlowTag().getFileName()));
-					String f = v.getFlowTag().getFileName();
+					String f = v.getFileName();
 
 					// 此处计算列值
 					int columnIndex = GetMinValue(column_height);
@@ -287,16 +286,9 @@ public class MainActivity extends Activity {
 
 		item.setRowIndex(rowIndex);
 		item.setId(id);
-		item.setViewHandler(this.handler);
-		
-		// 多线程参数
-		FlowTag param = new FlowTag();
-		param.setFlowId(id);
-		param.setAssetManager(asset_manager);
-		param.setFileName(image_path + "/" + filename);
-		param.setItemWidth(item_width);
-
-		item.setFlowTag(param);
+		item.setViewHandler(handler);
+		item.setFileName(image_path + "/" + filename);
+		item.setItemWidth(item_width);
 		item.LoadImage();
 		// waterfall_items.get(columnIndex).addView(item);
 
