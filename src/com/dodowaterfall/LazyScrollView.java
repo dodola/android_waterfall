@@ -80,7 +80,8 @@ public class LazyScrollView extends ScrollView {
 				break;
 			case MotionEvent.ACTION_UP:
 				if (view != null && onScrollListener != null) {
-					handler.sendMessageDelayed(handler.obtainMessage(1), 200);
+					handler.sendMessageDelayed(handler.obtainMessage(
+							Constants.HANDLER_WHAT), Constants.MESSAGE_DELAY);
 				}
 				break;
 
