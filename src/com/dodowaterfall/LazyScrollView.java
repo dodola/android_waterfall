@@ -9,13 +9,9 @@ import android.view.View;
 import android.widget.ScrollView;
 
 public class LazyScrollView extends ScrollView {
-	@Override
-	protected void onScrollChanged(int l, int t, int oldl, int oldt) {
-		super.onScrollChanged(l, t, oldl, oldt);
-		onScrollListener.onAutoScroll(l, t, oldl, oldt);
-	}
-
+	
 	private static final String tag = "LazyScrollView";
+	
 	private Handler handler;
 	private View view;
 
@@ -33,14 +29,11 @@ public class LazyScrollView extends ScrollView {
 		super(context, attrs, defStyle);
 
 	}
-
-	// 这个获得总的高度
-	public int computeVerticalScrollRange() {
-		return super.computeHorizontalScrollRange();
-	}
-
-	public int computeVerticalScrollOffset() {
-		return super.computeVerticalScrollOffset();
+	
+	@Override
+	protected void onScrollChanged(int l, int t, int oldl, int oldt) {
+		super.onScrollChanged(l, t, oldl, oldt);
+		onScrollListener.onAutoScroll(l, t, oldl, oldt);
 	}
 
 	private void init() {
@@ -87,7 +80,8 @@ public class LazyScrollView extends ScrollView {
 				break;
 			case MotionEvent.ACTION_UP:
 				if (view != null && onScrollListener != null) {
-					handler.sendMessageDelayed(handler.obtainMessage(1), 200);
+					handler.sendMessageDelayed(handler.obtainMessage(
+							Constants.HANDLER_WHAT), Constants.MESSAGE_DELAY);
 				}
 				break;
 

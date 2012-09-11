@@ -3,29 +3,22 @@ package com.dodowaterfall;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
 import com.dodowaterfall.LazyScrollView.OnScrollListener;
-import com.dodowaterfall.widget.FlowTag;
 import com.dodowaterfall.widget.FlowView;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.AssetManager;
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.Display;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
-import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
@@ -39,8 +32,8 @@ public class MainActivity extends Activity {
 	private Handler handler;
 	private int item_width;
 
-	private int column_count = 4;// 显示列数
-	private int page_count = 30;// 每次加载30张图片
+	private int column_count = Constants.COLUMN_COUNT;// 显示列数
+	private int page_count = Constants.PICTURE_COUNT_PER_LOAD;// 每次加载30张图片
 
 	private int current_page = 0;// 当前页数
 
@@ -67,7 +60,7 @@ public class MainActivity extends Activity {
 
 		display = this.getWindowManager().getDefaultDisplay();
 		item_width = display.getWidth() / column_count;// 根据屏幕大小计算每列大小
-		asset_manager = this.getAssets();
+		asset_manager = getAssets();
 
 		column_height = new int[column_count];
 		context = this;
@@ -203,7 +196,7 @@ public class MainActivity extends Activity {
 				// super.handleMessage(msg);
 
 				switch (msg.what) {
-				case 1:
+				case Constants.HANDLER_WHAT:
 
 					FlowView v = (FlowView) msg.obj;
 					int w = msg.arg1;
@@ -214,7 +207,7 @@ public class MainActivity extends Activity {
 					// v.getHeight(), v.getId(), v
 					// .getColumnIndex(), v.getRowIndex(),
 					// v.getFlowTag().getFileName()));
-					String f = v.getFlowTag().getFileName();
+					String f = v.getFileName();
 
 					// 此处计算列值
 					int columnIndex = GetMinValue(column_height);
@@ -259,21 +252,21 @@ public class MainActivity extends Activity {
 		}
 
 		// 加载所有图片路径
-
 		try {
 			image_filenames = Arrays.asList(asset_manager.list(image_path));
-
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
 		// 第一次加载
 		AddItemToContainer(current_page, page_count);
 	}
 
 	private void AddItemToContainer(int pageindex, int pagecount) {
+		
 		int currentIndex = pageindex * pagecount;
-
-		int imagecount = 10000;// image_filenames.size();
+		int imagecount = Constants.PICTURE_TOTAL_COUNT;// image_filenames.size();
+		
 		for (int i = currentIndex; i < pagecount * (pageindex + 1)
 				&& i < imagecount; i++) {
 			loaded_count++;
@@ -293,15 +286,9 @@ public class MainActivity extends Activity {
 
 		item.setRowIndex(rowIndex);
 		item.setId(id);
-		item.setViewHandler(this.handler);
-		// 多线程参数
-		FlowTag param = new FlowTag();
-		param.setFlowId(id);
-		param.setAssetManager(asset_manager);
-		param.setFileName(image_path + "/" + filename);
-		param.setItemWidth(item_width);
-
-		item.setFlowTag(param);
+		item.setViewHandler(handler);
+		item.setFileName(image_path + "/" + filename);
+		item.setItemWidth(item_width);
 		item.LoadImage();
 		// waterfall_items.get(columnIndex).addView(item);
 
