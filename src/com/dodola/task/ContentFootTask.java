@@ -1,7 +1,6 @@
 package com.dodola.task;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +18,7 @@ import com.dodola.views.InfosListAdapter;
 
 public class ContentFootTask extends TaskBase {
 
-	public ContentActivity	contentActivity;
+	public ContentActivity contentActivity;
 
 	public ContentFootTask(ContentActivity newsContentActivity) {
 		super();
@@ -30,8 +29,7 @@ public class ContentFootTask extends TaskBase {
 	protected List<Map<String, Object>> doInBackground(String... params) {
 		try {
 			parseNewsJSON(params[0]);
-		}
-		catch (IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		return null;
@@ -39,11 +37,9 @@ public class ContentFootTask extends TaskBase {
 
 	@Override
 	protected void onPostExecute(List<Map<String, Object>> result) {
-		if (this.contentActivity.newsLeft != null
-				&& this.contentActivity.newsLeft.getNewsInfos() != null) {
+		if (this.contentActivity.newsLeft != null && this.contentActivity.newsLeft.getNewsInfos() != null) {
 			if (null == this.contentActivity.listAdapter) {
-				this.contentActivity.listAdapter = new InfosListAdapter(this.contentActivity,
-					this.contentActivity.newsLeft.getNewsInfos(), this.contentActivity.smallBmp);
+				this.contentActivity.listAdapter = new InfosListAdapter(this.contentActivity, this.contentActivity.newsLeft.getNewsInfos(), this.contentActivity.smallBmp);
 			}
 			this.contentActivity.listAdapter.setList(this.contentActivity.newsLeft.getNewsInfos());
 			this.contentActivity.listAdapter.notifyDataSetChanged();
@@ -66,12 +62,8 @@ public class ContentFootTask extends TaskBase {
 		String json = "";
 		if (this.contentActivity.checkConnection()) {
 			try {
-				InputStream inputStream = getStreamByGetURL(url);
-				if (null != inputStream) {
-					json = new String(readInputStream(inputStream));
-				}
-			}
-			catch (IOException e) {
+				json = this.getStringFromUrl(url);
+			} catch (IOException e) {
 				Log.e("IOException is : ", e.toString());
 				e.printStackTrace();
 				return;
@@ -86,22 +78,17 @@ public class ContentFootTask extends TaskBase {
 				for (int i = 0; i < blogsJson.length(); i++) {
 					JSONObject newsInfoLeftObject = blogsJson.getJSONObject(i);
 					DuitangInfo newsInfo1 = new DuitangInfo();
-					newsInfo1.setAlbid(newsInfoLeftObject.isNull("albid")
-							? "" : newsInfoLeftObject.getString("albid"));
-					newsInfo1.setIsrc(newsInfoLeftObject.isNull("isrc")
-							? "" : newsInfoLeftObject.getString("isrc"));
-					newsInfo1.setMsg(newsInfoLeftObject.isNull("msg")
-							? "" : newsInfoLeftObject.getString("msg"));
+					newsInfo1.setAlbid(newsInfoLeftObject.isNull("albid") ? "" : newsInfoLeftObject.getString("albid"));
+					newsInfo1.setIsrc(newsInfoLeftObject.isNull("isrc") ? "" : newsInfoLeftObject.getString("isrc"));
+					newsInfo1.setMsg(newsInfoLeftObject.isNull("msg") ? "" : newsInfoLeftObject.getString("msg"));
 					newsLeftInfos.add(newsInfo1);
 				}
 				this.contentActivity.newsLeft.setNewsInfos(newsLeftInfos);
-			}
-			catch (JSONException e) {
+			} catch (JSONException e) {
 				e.printStackTrace();
 			}
 
-		}
-		else {
+		} else {
 			// 出现网络异常
 		}
 	}
