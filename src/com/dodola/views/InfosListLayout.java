@@ -25,7 +25,6 @@ public class InfosListLayout extends LinearLayout {
 	public InfosListAdapter adapter;
 	public int count;
 
-	// -------------------------------------------------------
 	private ScrollView sv;
 	private InfosListLayoutInterface mEventInterface;// 事件回调接口
 	private int iDrection = 0;// 滚动方向,向上滚动值是-1，向下滚动值是1
@@ -48,7 +47,6 @@ public class InfosListLayout extends LinearLayout {
 
 	private boolean addViewOnce = false;
 
-	// ------------------------------------------------------
 
 	public InfosListLayout(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -67,16 +65,12 @@ public class InfosListLayout extends LinearLayout {
 
 		if (addViewOnce) {
 			leftLayout = new LinearLayout(context);
-			LinearLayout.LayoutParams leftParams = new LinearLayout.LayoutParams(
-					LinearLayout.LayoutParams.FILL_PARENT,
-					LinearLayout.LayoutParams.WRAP_CONTENT, 1);
+			LinearLayout.LayoutParams leftParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1);
 			leftLayout.setOrientation(LinearLayout.VERTICAL);
 			leftLayout.setGravity(Gravity.CENTER_HORIZONTAL);
 			leftLayout.setLayoutParams(leftParams);
 			rightLayout = new LinearLayout(context);
-			LinearLayout.LayoutParams rightParams = new LinearLayout.LayoutParams(
-					LinearLayout.LayoutParams.FILL_PARENT,
-					LinearLayout.LayoutParams.WRAP_CONTENT, 1);
+			LinearLayout.LayoutParams rightParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1);
 			rightLayout.setOrientation(LinearLayout.VERTICAL);
 			rightLayout.setLayoutParams(rightParams);
 
@@ -92,24 +86,19 @@ public class InfosListLayout extends LinearLayout {
 			count++;
 			final View view = adapter.getView(i, null, null);
 			list_one_screen_view.add(view);
-			LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-					LinearLayout.LayoutParams.WRAP_CONTENT,
-					LinearLayout.LayoutParams.WRAP_CONTENT);
+			LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
 			if (0 == i % 2) {
 				leftLayout.addView(view, params);
 			} else {
 				rightLayout.addView(view, params);
 			}
-			// ---------------------------------------------
 			ViewTreeObserver vto = view.getViewTreeObserver();
 			vto.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
 				@Override
 				public boolean onPreDraw() {
-					// TODO Auto-generated method stub
 					view.getViewTreeObserver().removeOnPreDrawListener(this);
 					// 每个子控件的矩形位置
-					Rect retChildView = new Rect(view.getLeft(), view.getTop(),
-							view.getRight(), view.getBottom());
+					Rect retChildView = new Rect(view.getLeft(), view.getTop(), view.getRight(), view.getBottom());
 					childView_rect.add(retChildView);
 					if (iAllViewHeight_px < retChildView.bottom) {
 						iAllViewHeight_px = retChildView.bottom;
@@ -123,11 +112,9 @@ public class InfosListLayout extends LinearLayout {
 			ViewTreeObserver vto = this.getViewTreeObserver();
 			vto.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
 				public boolean onPreDraw() {
-					// TODO Auto-generated method stub
 					Rect rect = new Rect();
-					InfosListLayout.this.getViewTreeObserver()
-							.removeOnPreDrawListener(this);
-					InfosListLayout.this.getGlobalVisibleRect(rect); // 严重注意，对于布局控件只有这样才能获得真正可见的高度和宽度
+					InfosListLayout.this.getViewTreeObserver().removeOnPreDrawListener(this);
+					InfosListLayout.this.getGlobalVisibleRect(rect); //获取layout的矩形数据
 					self_height = rect.height();
 					self_width = rect.width();
 					computeScroll_flag = true;
@@ -138,7 +125,6 @@ public class InfosListLayout extends LinearLayout {
 			once_flag = false;
 		}
 		((ContentActivity) context).newsLeft.setNewsInfos(null);
-		// ---------------------------------------------
 		this.addNewView_flag = true;
 	}
 
@@ -151,8 +137,7 @@ public class InfosListLayout extends LinearLayout {
 		return count;
 	}
 
-	// -----------------------------------------------------------------
-	// 这个方法必须调用,给本布局设置事件借口，用来释放和加载图片
+	// 这个方法必须调用,给本布局设置事件接口，用来释放和加载图片
 	public void setEvent(InfosListLayoutInterface mEventInterface) {
 		this.mEventInterface = mEventInterface;
 	}
@@ -162,23 +147,20 @@ public class InfosListLayout extends LinearLayout {
 		this.sv = sv;
 	}
 
-	// 初始化控件需要的数据
+	// 初始化控件需要的数据(效率偏低..)
 	public List<List<View>> initScreenView() {
 		synchronized (childView_rect) {
 			addNewView_flag = false;
 			all_screen_View.clear();
 			if (0 != childView_rect.size()) {
-				int screen_count = (int) Math
-						.ceil((double) this.iAllViewHeight_px / self_height);// 计算总共有多少屏
+				int screen_count = (int) Math.ceil((double) this.iAllViewHeight_px / self_height);// 计算总共有多少屏
 				List<Rect> self_rect = new ArrayList<Rect>();// 存放本布局的每屏矩形范围
 				for (int i = 0; i < screen_count; i++) {
-					self_rect.add(new Rect(0, i * self_height, self_width, i
-							* self_height + self_height));
+					
+					self_rect.add(new Rect(0, i * self_height, self_width, i * self_height + self_height));
 					List<View> one_screen = new ArrayList<View>();// 存放一屏所包含的View
 					for (int j = 0; j < childView_rect.size(); j++) {// 判断出每屏包含的View
-						if (childView_rect.get(j).intersect(self_rect.get(i))
-								|| childView_rect.get(j).contains(
-										self_rect.get(i))) {
+						if (childView_rect.get(j).intersect(self_rect.get(i)) || childView_rect.get(j).contains(self_rect.get(i))) {
 							one_screen.add(list_one_screen_view.get(j));
 						}
 					}
@@ -195,15 +177,13 @@ public class InfosListLayout extends LinearLayout {
 	@Override
 	public void computeScroll() {
 		super.computeScroll();
-		// TODO Auto-generated method stub
 		if (computeScroll_flag) {
 			if (0 != this.self_height) {
 				// int iSVY = sv.getScrollY();
 				// if (Math.abs(iSVY - preSVY) > 10) {
 				iCureetScreen = (int) sv.getScrollY() / (int) this.self_height;
 				// System.out.println("当前滑动到了第几屏：" + iCureetScreen);
-				this.mEventInterface.onCurChileCtrlScreen(iCureetScreen,
-						iDrection, addNewView_flag);
+				this.mEventInterface.onCurChileCtrlScreen(iCureetScreen, iDrection, addNewView_flag);
 				// preSVY = iSVY;
 				// }
 			}

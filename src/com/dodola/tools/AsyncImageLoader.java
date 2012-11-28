@@ -12,7 +12,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Message;
 
-
 public class AsyncImageLoader {
 
 	public Map<String, SoftReference<Drawable>> imageCache;
@@ -21,8 +20,7 @@ public class AsyncImageLoader {
 		imageCache = new HashMap<String, SoftReference<Drawable>>();
 	}
 
-	public Drawable loaDrawable(final String imageUrl,
-			final ImageCallBack imageCallBack) {
+	public Drawable loaDrawable(final String imageUrl, final ImageCallBack imageCallBack) {
 		Bitmap bmpFromSD = FileCache.getInstance().getBmp(imageUrl);
 		if (null != bmpFromSD) {
 			return new BitmapDrawable(bmpFromSD);
@@ -63,7 +61,6 @@ public class AsyncImageLoader {
 			tempUrl = new URL(url);
 			inputStream = (InputStream) tempUrl.getContent();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		try {

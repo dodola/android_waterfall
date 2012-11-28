@@ -39,7 +39,14 @@ public class ContentTask extends TaskBase {
 	@Override
 	protected void onPostExecute(List<Map<String, Object>> result) {
 		if (this.contentActivity.newsLeft != null && this.contentActivity.newsLeft.getNewsInfos() != null) {
-			this.contentActivity.listAdapter = new InfosListAdapter(this.contentActivity, this.contentActivity.newsLeft.getNewsInfos(), this.contentActivity.smallBmp);
+			this.contentActivity.listAdapter = new InfosListAdapter(this.contentActivity, this.contentActivity.newsLeft.getNewsInfos()/*
+																																	 * ,
+																																	 * this
+																																	 * .
+																																	 * contentActivity
+																																	 * .
+																																	 * smallBmp
+																																	 */);
 			this.contentActivity.newsListLayout.clearData();
 			this.contentActivity.newsListLayout.setAdapter(this.contentActivity.listAdapter);
 		}

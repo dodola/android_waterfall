@@ -12,6 +12,8 @@ import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.Window;
 import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -29,10 +31,8 @@ import com.dodola.views.InfoImageView;
 import com.dodola.views.InfosListAdapter;
 import com.dodola.views.InfosListLayout;
 import com.dodola.views.InfosListLayoutInterface;
-import com.dodola.views.InfosSmallBmp;
 
-public class ContentActivity extends ActivityBase implements
-		InfosListLayoutInterface {
+public class ContentActivity extends ActivityBase implements InfosListLayoutInterface {
 	public InfosListAdapter listAdapter;
 	public InfosListLayout newsListLayout; // 列表控件
 	public LinearLayout newsButtonPro;
@@ -48,7 +48,6 @@ public class ContentActivity extends ActivityBase implements
 	private int isFirstCreate = 1;
 	public int isDetailBcak = 0;
 
-	public InfosSmallBmp smallBmp;
 	private int iIndex;
 	private List<List<View>> all_screen_view; // 封装每屏View集合的集合
 	boolean thread_once_flag = true; // 确保线程只被开启一次
@@ -58,6 +57,8 @@ public class ContentActivity extends ActivityBase implements
 	public ContentActivity() {
 		newsLeft = new Infos();
 	}
+
+	Animation animation;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -72,9 +73,9 @@ public class ContentActivity extends ActivityBase implements
 		progressBar = (ProgressBar) findViewById(R.id.progressBar);
 		newsButtonPro = (LinearLayout) findViewById(R.id.newsButtonPro);
 
-		smallBmp = new InfosSmallBmp();
 		newsListLayout.setScrollView(scrollView);
 		newsListLayout.setEvent(this);
+		animation = AnimationUtils.loadAnimation(ContentActivity.this, R.anim.gradually);
 
 		upDateList();
 
@@ -93,15 +94,12 @@ public class ContentActivity extends ActivityBase implements
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
 				// TODO Auto-generated method stub
-				if (event.getAction() == MotionEvent.ACTION_UP && flag == 0
-						&& progressBar.getVisibility() == View.INVISIBLE) { // 当手指离开ScrollView且数据已经加载完成
+				if (event.getAction() == MotionEvent.ACTION_UP && flag == 0 && progressBar.getVisibility() == View.INVISIBLE) { // 当手指离开ScrollView且数据已经加载完成
 					View view = ((ScrollView) v).getChildAt(0);
-					if (view.getMeasuredHeight() <= v.getScrollY()
-							+ v.getHeight()) { // 当ScrollView中包含的View的高度小于已经滚动了的值+SrollView本身的高度时
+					if (view.getMeasuredHeight() <= v.getScrollY() + v.getHeight()) { // 当ScrollView中包含的View的高度小于已经滚动了的值+SrollView本身的高度时
 						newsLoadMore.setVisibility(android.view.View.VISIBLE);
 						if (newsListLayout != null) {
-							new ContentFootTask(ContentActivity.this)
-									.execute("http://www.duitang.com/album/369270/masn/p/4/24/");
+							new ContentFootTask(ContentActivity.this).execute("http://www.duitang.com/album/369270/masn/p/4/24/");
 						} else {
 							return false;
 						}
@@ -116,8 +114,7 @@ public class ContentActivity extends ActivityBase implements
 
 			@Override
 			public void onClick(View v) {
-				new ContentFootTask(ContentActivity.this)
-						.execute("http://www.duitang.com/album/369270/masn/p/4/24/");
+				new ContentFootTask(ContentActivity.this).execute("http://www.duitang.com/album/369270/masn/p/4/24/");
 			}
 		});
 	}
@@ -143,20 +140,17 @@ public class ContentActivity extends ActivityBase implements
 	 * 加载数据资源
 	 * */
 	public void upDateList() {
-		new ContentTask(this)
-				.execute("http://www.duitang.com/album/369270/masn/p/4/24/"); // 请求数据
+		new ContentTask(this).execute("http://www.duitang.com/album/369270/masn/p/4/24/"); // 请求数据
 	}
 
 	@Override
 	protected void onResume() {
-		// TODO Auto-generated method stub
 		super.onResume();
 		if (isFirstCreate == 1) {
 			isFirstCreate = 0;
 		} else if (isDetailBcak == 1) {
 			isDetailBcak = 0;
-			ImageView imgCover = (ImageView) selectedView
-					.findViewById(R.id.news_cover);
+			ImageView imgCover = (ImageView) selectedView.findViewById(R.id.news_cover);
 			AlphaAnimation alphaAnimation = new AlphaAnimation(1f, 0f);
 			alphaAnimation.setDuration(1500);
 			alphaAnimation.setFillAfter(true);
@@ -174,6 +168,7 @@ public class ContentActivity extends ActivityBase implements
 			} else if (1 == msg.what) {
 				((ProgressBar) msg.obj).setVisibility(View.VISIBLE);
 			}
+
 		}
 	};
 
@@ -190,17 +185,12 @@ public class ContentActivity extends ActivityBase implements
 				List<View> one_screen_view = all_screen_view.get(i);
 				if (iIndex - 1 == i || iIndex + 1 == i) {
 					for (int j = 0; j < one_screen_view.size(); j++) {
-						RelativeLayout rootView = (RelativeLayout) one_screen_view
-								.get(j);
-						ProgressBar proBar = (ProgressBar) rootView
-								.findViewById(R.id.progressBar);
-						InfoImageView imageView = (InfoImageView) rootView
-								.findViewById(R.id.news_pic);
+						RelativeLayout rootView = (RelativeLayout) one_screen_view.get(j);
+						ProgressBar proBar = (ProgressBar) rootView.findViewById(R.id.progressBar);
+						InfoImageView imageView = (InfoImageView) rootView.findViewById(R.id.news_pic);
 						if (proBar.getVisibility() == View.INVISIBLE) {
 							Bitmap bmp = imageView.getBmp();
-							imageView.setMyImageBitmap(smallBmp
-									.getSmalBmpList()
-									.get(iBeforPresentBmps + j));
+							imageView.setMyImageBitmap(null);
 							proBar.setVisibility(View.VISIBLE);
 							this.freeBmp(bmp);
 						}
@@ -219,11 +209,6 @@ public class ContentActivity extends ActivityBase implements
 			managerBmp.manaBmp_flag = false;
 		}
 
-		for (int i = 0; i < smallBmp.getSmalBmpList().size(); i++) {
-			this.freeBmp(smallBmp.getSmalBmpList().get(i));
-		}
-		smallBmp.getSmalBmpList().clear();
-
 		// 释放掉MyImageView中的所有Bitmap
 		if (null != this.all_screen_view) {
 			int iBeforPresentBmps = 0;// 当前屏以前共有多少张图片
@@ -231,10 +216,8 @@ public class ContentActivity extends ActivityBase implements
 				List<View> one_screen_view = all_screen_view.get(i);
 
 				for (int j = 0; j < one_screen_view.size(); j++) {
-					RelativeLayout rootView = (RelativeLayout) one_screen_view
-							.get(j);
-					InfoImageView imageView = (InfoImageView) rootView
-							.findViewById(R.id.news_pic);
+					RelativeLayout rootView = (RelativeLayout) one_screen_view.get(j);
+					InfoImageView imageView = (InfoImageView) rootView.findViewById(R.id.news_pic);
 					Bitmap bmp = imageView.getBmp();
 					imageView.setMyImageBitmap(null);
 					this.freeBmp(bmp);
@@ -243,10 +226,8 @@ public class ContentActivity extends ActivityBase implements
 				// 删除SD卡上的多余的缓存（只保留第一次加载的图片缓存,不保留下拉或点击获得更多的图片）
 				if (iBeforPresentBmps >= 10) {
 					for (int j = 0; j < one_screen_view.size(); j++) {
-						RelativeLayout rootView = (RelativeLayout) one_screen_view
-								.get(j);
-						FileCache.getInstance().clearImgByImgUrl(
-								rootView.getTag().toString());
+						RelativeLayout rootView = (RelativeLayout) one_screen_view.get(j);
+						FileCache.getInstance().clearImgByImgUrl(rootView.getTag().toString());
 					}
 				}
 				iBeforPresentBmps += one_screen_view.size();
@@ -264,18 +245,15 @@ public class ContentActivity extends ActivityBase implements
 
 	@Override
 	public void onCurChileCtrlScreen(int index, int direct, boolean flag) {
-		// TODO Auto-generated method stub
 		int preIndex = this.iIndex;
 		this.iIndex = index;
 		this.initFlag = flag;
-		if (null == managerBmp || !managerBmp.isAlive()) {
-			managerBmp = new ManagerBmp(handler); // 注意这里必须在重新赋值;如果不重新赋值的话线程结束后，这个引用指向的是已经结束了的线程对象（已经在内存中不存在咯）
+		if (null == managerBmp || !managerBmp.isAlive()) { // 线程处理完成后才会重新处理
+			managerBmp = new ManagerBmp(handler);
 			managerBmp.query_flag = true;
 			managerBmp.manaBmp_flag = false;
-			all_screen_view = newsListLayout.initScreenView();
-			// System.out.println("总共有多少屏---------------->"
-			// + all_screen_view.size());
 			// 取得封装每屏View集合的集合
+			all_screen_view = newsListLayout.initScreenView();
 			managerBmp.start(); // 守护线程只开启一次
 		}
 
@@ -283,6 +261,14 @@ public class ContentActivity extends ActivityBase implements
 			managerBmp.manaBmp_flag = true;
 		}
 	}
+
+	public Runnable uiRunnable = new Runnable() {
+
+		@Override
+		public void run() {
+
+		}
+	};
 
 	class ManagerBmp extends Thread {
 		public boolean manaBmp_flag = false;
@@ -306,48 +292,36 @@ public class ContentActivity extends ActivityBase implements
 					List<View> one_screen_view = all_screen_view.get(i);
 					if (iIndex - 1 == i || iIndex == i || iIndex + 1 == i) {
 						for (int j = 0; j < one_screen_view.size(); j++) {
-							RelativeLayout rootView = (RelativeLayout) one_screen_view
-									.get(j);
-							ProgressBar proBar = (ProgressBar) rootView
-									.findViewById(R.id.progressBar);
-							InfoImageView imageView = (InfoImageView) rootView
-									.findViewById(R.id.news_pic);
+							RelativeLayout rootView = (RelativeLayout) one_screen_view.get(j);
+							ProgressBar proBar = (ProgressBar) rootView.findViewById(R.id.progressBar);
+							final InfoImageView imageView = (InfoImageView) rootView.findViewById(R.id.news_pic);
 
 							if (proBar.getVisibility() == View.VISIBLE) {
 								// 获得SD卡上的图片
-								Bitmap bmp = FileCache.getInstance().getBmp(
-										rootView.getTag().toString());
-								// System.out
-								// .println("从SD卡上读取图片-------------------------");
-								// System.out.println(rootView.getTag()
-								// + "------------>图片的URL地址");
-								// System.out.println("守护线程开始加载图片...");
+								Bitmap bmp = FileCache.getInstance().getBmp(rootView.getTag().toString());
+
 								if (null != bmp) {
 									imageView.setMyImageBitmap(bmp);
-									// System.out.println("开始加载第"
-									// + (iBeforPresentBmps + j) + "个View的图片");
+									
 									Message msg3 = handler.obtainMessage();
 									msg3.what = 0; // 让ProgressBar消失
 									msg3.obj = proBar;
+
 									handler.sendMessage(msg3);
 								}
 							}
 						}
-					} else {
+					} else {// 其他的回收掉
 						for (int j = 0; j < one_screen_view.size(); j++) {
-							RelativeLayout rootView = (RelativeLayout) one_screen_view
-									.get(j);
-							ProgressBar proBar = (ProgressBar) rootView
-									.findViewById(R.id.progressBar);
-							InfoImageView imageView = (InfoImageView) rootView
-									.findViewById(R.id.news_pic);
+							RelativeLayout rootView = (RelativeLayout) one_screen_view.get(j);
+							ProgressBar proBar = (ProgressBar) rootView.findViewById(R.id.progressBar);
+							InfoImageView imageView = (InfoImageView) rootView.findViewById(R.id.news_pic);
 							Bitmap bitmap = null;
 							if (proBar.getVisibility() == View.INVISIBLE) {
 								bitmap = imageView.getBmp();
-								imageView.setMyImageBitmap(smallBmp
-										.getSmalBmpList().get(
-												iBeforPresentBmps + j));// 先给它设置小内存的默认图片
+								imageView.setMyImageBitmap(null);// 空白
 								ContentActivity.this.freeBmp(bitmap);// 释放掉
+								
 								Message msg = handler.obtainMessage();
 								msg.what = 1; // ProgressBar出现
 								msg.obj = proBar;
@@ -362,7 +336,6 @@ public class ContentActivity extends ActivityBase implements
 				try {
 					Thread.sleep(500);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}

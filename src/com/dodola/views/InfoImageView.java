@@ -32,6 +32,7 @@ public class InfoImageView extends ImageView {
 
 	@Override
 	protected void onDraw(Canvas canvas) {
+		
 		if (null != bitmap) {
 			synchronized (bitmap) {// ......
 				if (null != bitmap && !bitmap.isRecycled()) {

@@ -39,7 +39,7 @@ public class ContentFootTask extends TaskBase {
 	protected void onPostExecute(List<Map<String, Object>> result) {
 		if (this.contentActivity.newsLeft != null && this.contentActivity.newsLeft.getNewsInfos() != null) {
 			if (null == this.contentActivity.listAdapter) {
-				this.contentActivity.listAdapter = new InfosListAdapter(this.contentActivity, this.contentActivity.newsLeft.getNewsInfos(), this.contentActivity.smallBmp);
+				this.contentActivity.listAdapter = new InfosListAdapter(this.contentActivity, this.contentActivity.newsLeft.getNewsInfos()/*, this.contentActivity.smallBmp*/);
 			}
 			this.contentActivity.listAdapter.setList(this.contentActivity.newsLeft.getNewsInfos());
 			this.contentActivity.listAdapter.notifyDataSetChanged();
