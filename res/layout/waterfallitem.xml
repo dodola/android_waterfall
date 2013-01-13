@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.dodowaterfall.widget.FlowView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/waterfall_image"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:src="@drawable/ic_launcher" >
+
+</com.dodowaterfall.widget.FlowView>

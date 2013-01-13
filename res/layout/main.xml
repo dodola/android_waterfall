@@ -1,14 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<sqq.ScrollViewPull.widget.TryRefreshableView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/trymyRV"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="@drawable/background" >
+    android:focusable="true"
+    android:orientation="vertical" >
 
+    <sqq.ScrollViewPull.widget.TryPullToRefreshScrollView
+        android:id="@+id/waterfall_scroll"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:scrollbars="vertical" >
 
-            <LinearLayout
-                android:id="@+id/news_content"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent" >
-            </LinearLayout>
+        <LinearLayout
+            android:id="@+id/waterfall_container"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:background="@drawable/background" >
+        </LinearLayout>
+    </sqq.ScrollViewPull.widget.TryPullToRefreshScrollView>
 
-</RelativeLayout>
+</sqq.ScrollViewPull.widget.TryRefreshableView>

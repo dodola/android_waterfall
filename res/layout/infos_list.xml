@@ -1,68 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/news_list"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:gravity="center_horizontal" >
+    android:background="@drawable/news_item_bg"
+    android:orientation="vertical" >
 
-    <LinearLayout
-        android:id="@+id/news_list"
+    <com.dodowaterfall.widget.FlowView
+        android:id="@+id/news_pic"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="5dip"
-        android:background="@drawable/news_item_bg"
-        android:orientation="vertical"
-        android:paddingBottom="10dip"
-        android:paddingLeft="7dip"
-        android:paddingRight="7dip"
-        android:paddingTop="10dip" >
+        android:layout_gravity="center_horizontal"
+        android:focusable="false"
+        android:maxHeight="500dip"
+        android:maxWidth="500dip" />
 
-        <com.dodola.views.InfoImageView
-            android:id="@+id/news_pic"
-            android:layout_width="140dip"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="3dip"
-            android:adjustViewBounds="true"
-            android:focusable="false"
-            android:maxHeight="500dip"
-            android:maxWidth="500dip" />
-
-        <TextView
-            android:id="@+id/news_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:singleLine="false"
-            android:textColor="#656565" />
-
-        <TextView
-            android:id="@+id/news_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="right|bottom"
-            android:gravity="right"
-            android:text="@string/temp_date"
-            android:textColor="#9f9f9f" />
-    </LinearLayout>
-
-    <ImageView
-        android:id="@+id/news_cover"
+    <TextView
+        android:id="@+id/news_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@id/news_list"
-        android:layout_alignLeft="@id/news_list"
-        android:layout_alignRight="@id/news_list"
-        android:layout_alignTop="@id/news_list"
-        android:background="@drawable/news_item_bg_cover"
-        android:visibility="invisible" >
-    </ImageView>
+        android:layout_below="@+id/news_pic"
+        android:singleLine="false"
+        android:textColor="#656565" />
 
-    <ProgressBar
-        android:id="@+id/progressBar"
-        style="?android:attr/progressBarStyleSmall"
+    <TextView
+        android:id="@+id/news_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="60dip"
-        android:visibility="visible" />
+        android:layout_below="@id/news_title"
+        android:layout_gravity="right|bottom"
+        android:gravity="right"
+        android:textColor="#9f9f9f" />
 
-</RelativeLayout>
+</LinearLayout>
