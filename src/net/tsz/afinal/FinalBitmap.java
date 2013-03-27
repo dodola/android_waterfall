@@ -519,7 +519,7 @@ public class FinalBitmap {
 					}
 				}
 			}
-
+			flushCache();
 			if (mImageCache != null && !isCancelled() && !mExitTasksEarly) {
 				bitmap = mImageCache.getBitmapFromDiskCache(dataString);
 			}
