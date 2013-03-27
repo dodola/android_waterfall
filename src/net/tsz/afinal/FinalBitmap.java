@@ -519,6 +519,7 @@ public class FinalBitmap {
 					}
 				}
 			}
+			flushCache();// 实际上，demo中很少会内存溢出是因为demo很少使用磁盘缓存。但实际项目中，因为会多次打开关闭生成很多可用的磁盘缓存。而磁盘缓存的Bitmap并没有回收机制。我在这里暴力的调用了刷新缓存，虽然已经不再因为磁盘OOM，但我我觉得不足够漂亮，请作者斧正。
 
 			if (mImageCache != null && !isCancelled() && !mExitTasksEarly) {
 				bitmap = mImageCache.getBitmapFromDiskCache(dataString);
