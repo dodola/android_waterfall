@@ -362,6 +362,9 @@ public class MainActivity extends Activity implements ImageLoadCompleteListener 
 
 		@Override
 		protected void onPostExecute(List<DuitangInfo> result) {
+			if(result == null || result.size() <= 0){//有可能因为网络或者数据源本身无数据，如果没有此处逻辑会导致下拉刷新bar不被隐藏滨且无法刷新新数据
+				totalDataCount = 0;
+			}
 			totalDataCount = result.size();
 			for (DuitangInfo info : result) {
 				fb.display(info);
