@@ -156,6 +156,13 @@ public class LruMemoryCache<K, V> {
             entryRemoved(true, key, value, null);
         }
     }
+    
+    /**
+     * 检测并删除超出MaxSize的引用
+     */
+    public void trimToMax() {
+    	trimToSize(maxSize);
+    }
 
     /**
      * Removes the entry for {@code key} if it exists.
