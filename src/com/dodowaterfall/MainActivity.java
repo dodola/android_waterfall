@@ -156,17 +156,17 @@ public class MainActivity extends Activity implements ImageLoadCompleteListener 
 										.getChildAt(Math.min(
 												1 + bottomIndex[k],
 												lineIndex[k]));
-
-								FlowView picView = (FlowView) childAt
-										.findViewById(R.id.news_pic);
-								if (picView.bitmap == null
-										&& !TextUtils.isEmpty(picView.get_url())) {
-									fb.reload(picView.get_url(), picView);
+								if(childAt != null){
+									FlowView picView = (FlowView) childAt
+											.findViewById(R.id.news_pic);
+									if (picView.bitmap == null
+											&& !TextUtils.isEmpty(picView.get_url())) {
+										fb.reload(picView.get_url(), picView);
+									}
+	
+									bottomIndex[k] = Math.min(1 + bottomIndex[k],
+											lineIndex[k]);
 								}
-
-								bottomIndex[k] = Math.min(1 + bottomIndex[k],
-										lineIndex[k]);
-
 							}
 							// Log.d("MainActivity",
 							// "headIndex:" + topIndex[k] + "  footIndex:"
