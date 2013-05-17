@@ -214,8 +214,9 @@ public class BitmapCache {
                     if (snapshot != null) {
                         inputStream = snapshot.getInputStream(DISK_CACHE_INDEX);
                         if (inputStream != null) {
-                            final Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                            return bitmap;
+				mMemoryCache.trimToMax();// 使用BitmapCache时，控制MaxSize
+				final Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+				return bitmap;
                         }
                     }
                 } catch (final IOException e) {
