@@ -5,7 +5,9 @@ Android瀑布流实例
 
 我现在在其他类似的瀑布流上进行完善开发,
 
-####请关注：[PinterestLikeAdapterView](https://github.com/dodola/PinterestLikeAdapterView)
+####请关注：
+1. [PinterestLikeAdapterView](https://github.com/dodola/PinterestLikeAdapterView)
+2. [WaterFallExt](https://github.com/dodola/WaterFallExt)
 
 有必要解释一下程序为什么采用addview方式而不是做成类似于ListView的那种Adapter数据方式。
 
