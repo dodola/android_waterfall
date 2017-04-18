@@ -5,7 +5,7 @@ Android瀑布流实例
 
 我现在在其他类似的瀑布流上进行完善开发,
 
-####请关注：
+#### 请关注：
 1. [PinterestLikeAdapterView](https://github.com/dodola/PinterestLikeAdapterView)
 2. [WaterFallExt](https://github.com/dodola/WaterFallExt)
 
